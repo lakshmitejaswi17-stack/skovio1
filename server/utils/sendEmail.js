@@ -1,20 +1,11 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendOTPEmail = async (email, otp) => {
-  await transporter.sendMail({
-    from: `"SecureAuth" <${process.env.EMAIL_USER}>`,
-    to: email,
+  const result = await resend.emails.send({
+    from: '"SecureAuth" <onboarding@resend.dev>',
+    to: [email],
     subject: "Your SecureAuth verification code",
     html: `
       <div style="
@@ -95,6 +86,8 @@ const sendOTPEmail = async (email, otp) => {
       </div>
     `,
   });
+
+  return result;
 };
 
 module.exports = sendOTPEmail;
